@@ -3,7 +3,7 @@ import socket
 class Cliente:
     def client_program():
         print("inicio cliente program")
-        host = "localhost"  
+        host = "192.168.0.3"  
         port = 5000 
         client_socket = socket.socket()  
         client_socket.connect((host, port))  
