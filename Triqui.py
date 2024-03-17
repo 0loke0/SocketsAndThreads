@@ -1,8 +1,8 @@
 class Triqui:
-    def __init__(self, mapa):
-        self.mapaTriqui = [ ["","",""],
-                            ["","",""],
-                            ["","",""]] if mapa == None else mapa
+    def __init__(self):
+        self.mapaTriqui =  [["-","-","-"],
+                            ["-","-","-"],
+                            ["-","-","-"]] 
 
     # Recorrido
     # |1 |2 |3
@@ -12,21 +12,25 @@ class Triqui:
         for mapaHorizontal  in self.mapaTriqui:
             for valor in mapaHorizontal:
                 print("|",valor," ", end=" ")
-            print("\n") #salto de linea
+            print("\n") #salto de linea        
+        
+        print("===============")
     
-    def RealizarMovimiento(self,simboloJugador,cordenada):
-        self.mapaTriqui[cordenada.x][cordenada.y] = simboloJugador
-        self.ValidarGanador();
-        return self.mapaTriqui;
-
+    def RealizarMovimiento(self,movimiento):   
+        if self.mapaTriqui[movimiento.x][movimiento.y] == "-":
+            self.mapaTriqui[movimiento.x][movimiento.y] = movimiento.simboloJugador
+        self.ImprimirTablero();
+        return self.ValidarGanador() # Si regresa true significa que ha finalizado el juego 
     
-    
+    #Pendiente mejorar errores de validacionde ganador y de mapa lleno
     def ValidarGanador(self):
         self.jugadorX = 0;
         self.jugadorO = 0;
 
         cadenaOrdenada = [0,1,2]
         cadenaInvertida = [2,1,0]
+
+        self.finalizarJuego = False
 
         def sumarEnLinea(valor):
             if (valor == "X"):
@@ -37,8 +41,10 @@ class Triqui:
         def validarGanadorFinal():        
             if(self.jugadorX == 3):
                 print("Has ganado jugador X")
+                self.finalizarJuego = True
             if(self.jugadorO == 3):
                 print("Has ganado jugador O")
+                self.finalizarJuego = True
             else:
                 self.jugadorX = 0;
                 self.jugadorO = 0;
@@ -69,7 +75,7 @@ class Triqui:
             sumarEnLinea(valor)
         validarGanadorFinal()
 
-        
+        return self.finalizarJuego
 
         
     

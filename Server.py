@@ -1,16 +1,33 @@
+import pickle
 import socket
 import threading
+import Movimiento
+import Triqui
 
+triqui = Triqui.Triqui();
+
+def SolicitarMovimiento(simboloJugador):
+    ingreso = input("Ingrese X y Y: Ejemplo '0 1' sin comillas => ")
+    partes = ingreso.split()
+    x = int(partes[0])
+    y = int(partes[1])
+    return Movimiento.Movimiento(x,y,simboloJugador)
 
 def nuevoCliente(conexiones,address):
-    while True:
-        print("Conectado desde: " + str(address))
-        data = conexiones.recv(1024).decode()
-        if not data:
+    while True:        
+        #Recepcion
+        movimientoRecibido = conexiones.recv(1024)
+        if movimientoRecibido != None:
+            movimientoRecibidoDeserializado = pickle.loads(movimientoRecibido)
+            if(triqui.RealizarMovimiento(movimientoRecibidoDeserializado)):
+                break        
+
+        #Envio
+        movimientoAEnviar = SolicitarMovimiento("X");
+        movimientoAEnviarSerializado = pickle.dumps(movimientoAEnviar)        
+        conexiones.sendall(movimientoAEnviarSerializado) 
+        if(triqui.RealizarMovimiento(movimientoAEnviar)):
             break
-        print("Cliente: " + str(data))
-        data = input(' -> ')
-        conexiones.send(data.encode()) 
     conexiones.close()
    
 print("inicio server program")
@@ -19,9 +36,10 @@ port = 5000
 serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  
 serverSocket.bind((host, port)) 
 serverSocket.listen(5)
-conexiones, address = serverSocket.accept()  
-print("Conectado desde: " + str(address))
-while True:       
-        threading.Thread(nuevoCliente(conexiones,address)).start();
+while True: 
+    conexiones, address = serverSocket.accept()        
+    threading.Thread(nuevoCliente(conexiones,address)).start();
+
+
 
  
