@@ -1,33 +1,36 @@
 import pickle
 import socket
 import threading
-import Movimiento
-import Triqui
+from Servidor.ArbolBinarioBusqueda import ArbolBinarioBusqueda
 
-triqui = Triqui.Triqui();
+arbol = ArbolBinarioBusqueda()
 
-def SolicitarMovimiento(simboloJugador):
-    ingreso = input("Ingrese X y Y: Ejemplo '0 1' sin comillas => ")
-    partes = ingreso.split()
-    x = int(partes[0])
-    y = int(partes[1])
-    return Movimiento.Movimiento(x,y,simboloJugador)
+def OrdenarPorBurbuja(arr):
+    n = len(arr)
+    # Iterar a través de todos los elementos del array
+    for i in range(n):
+        # Last i elementos ya están en su lugar correcto
+        for j in range(0, n-i-1):
+            # Intercambiar si el elemento encontrado es mayor que el siguiente elemento
+            if arr[j] > arr[j+1]:
+                arr[j], arr[j+1] = arr[j+1], arr[j]
 
 def nuevoCliente(conexiones,address):
     while True:        
         #Recepcion
-        movimientoRecibido = conexiones.recv(1024)
-        if movimientoRecibido != None:
-            movimientoRecibidoDeserializado = pickle.loads(movimientoRecibido)
-            if(triqui.RealizarMovimiento(movimientoRecibidoDeserializado)):
-                break        
-
+        numeroEnteroRecibido = conexiones.recv(1024)
+        numeroEnteroRecibidoDeserializado = pickle.loads(numeroEnteroRecibido)
+        if numeroEnteroRecibido != None:
+            arbol.insertar(int(numeroEnteroRecibidoDeserializado))      
+            
         #Envio
-        movimientoAEnviar = SolicitarMovimiento("X");
-        movimientoAEnviarSerializado = pickle.dumps(movimientoAEnviar)        
-        conexiones.sendall(movimientoAEnviarSerializado) 
-        if(triqui.RealizarMovimiento(movimientoAEnviar)):
-            break
+        arbol.listaArbolInorden = []
+        estructuraArbol = arbol.ObtenerInorder(arbol.raiz)
+        OrdenarPorBurbuja(estructuraArbol)
+        print(estructuraArbol)
+        estructuraArbolSerializado = pickle.dumps(estructuraArbol)        
+        conexiones.sendall(estructuraArbolSerializado) 
+        
     conexiones.close()
    
 print("inicio server program")

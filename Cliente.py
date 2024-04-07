@@ -1,16 +1,11 @@
 import pickle
 import socket
-import Movimiento
-import Triqui
 
-triqui = Triqui.Triqui();
+arrayOrdenamiento = []
 
-def SolicitarMovimiento(simboloJugador):
-    ingreso = input("Ingrese X y Y: Ejemplo '0 1' sin comillas => ")
-    partes = ingreso.split()
-    x = int(partes[0])
-    y = int(partes[1])
-    return Movimiento.Movimiento(x,y,simboloJugador)
+def SolicitarNumeroEntero():
+    ingreso = input("Ingrese un numero entero \n")    
+    return ingreso
 
 print("inicio cliente program")
 host = "localhost"  
@@ -20,18 +15,16 @@ client_socket.connect((host, port))
  
 while True:
     #Envio
-    movimientoAEnviar = SolicitarMovimiento("O")        
-    movimientoAEnviarSerializado = pickle.dumps(movimientoAEnviar)    
-    client_socket.sendall(movimientoAEnviarSerializado)
-    if(triqui.RealizarMovimiento(movimientoAEnviar)):
-        break
-
+    numeroEntero = SolicitarNumeroEntero()        
+    numeroEnteroSerializado = pickle.dumps(int(numeroEntero))   
+    client_socket.sendall(numeroEnteroSerializado)
+    
     #Recepcion
-    movimientoRecibido = client_socket.recv(1024)     
-    if movimientoRecibido != None:
-        movimientoRecibidoDeserializado = pickle.loads(movimientoRecibido)
-        if(triqui.RealizarMovimiento(movimientoRecibidoDeserializado)):
-            break   
+    arbolOrdenado = client_socket.recv(1024)
+    arbolOrdenadoDeserializado = pickle.loads(arbolOrdenado)
+    print("Array ordenado")
+    print(arbolOrdenadoDeserializado)
+   
 
 client_socket.close()  # close the connection
 
